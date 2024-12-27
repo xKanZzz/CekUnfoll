@@ -1,0 +1,66 @@
+let followers = [];
+let following = [];
+
+// Membaca file JSON yang diunggah
+function readFile(fileInput, callback) {
+    const file = fileInput.files[0];
+    if (!file) {
+        alert("Please select a file!");
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => callback(JSON.parse(e.target.result));
+    reader.readAsText(file);
+}
+
+// Fungsi utama untuk memeriksa non-followbacks
+function checkNonFollowBack() {
+    readFile(document.getElementById('followersFile'), (followersData) => {
+        followers = followersData.map(entry => entry.string_list_data[0].value);
+        readFile(document.getElementById('followingFile'), (followingData) => {
+            following = followingData.relationships_following.map(entry => entry.string_list_data[0]);
+            displayNonFollowBacks();
+        });
+    });
+}
+
+// Menampilkan hasil non-followbacks dalam tabel
+function displayNonFollowBacks() {
+    const notFollowingBack = following.filter(user => !followers.includes(user.value));
+    const resultDiv = document.getElementById('result');
+
+    if (notFollowingBack.length === 0) {
+        resultDiv.innerHTML = `<p class="text-lg text-gray-600 text-center">All users are following you back!</p>`;
+        return;
+    }
+
+    // Create the table with Tailwind styling
+    let tableHTML = `
+        <table class="min-w-full table-auto border-collapse">
+            <thead>
+                <tr class="bg-blue-600 text-white">
+                    <th class="px-4 py-2 border-b text-center">No</th>
+                    <th class="px-4 py-2 border-b text-center">Username</th>
+                    <th class="px-4 py-2 border-b text-center">Link Instagram</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    // Populate the table with the non-followback data
+    notFollowingBack.forEach((user, index) => {
+        tableHTML += `
+            <tr class="hover:bg-gray-100">
+                <td class="px-4 py-2 border-b text-center">${index + 1}</td>
+                <td class="px-4 py-2 border-b text-center">${user.value}</td>
+                <td class="px-4 py-2 border-b text-center">
+                    <a href="${user.href}" target="_blank" class="text-blue-500 hover:underline">Visit Profile</a>
+                </td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `</tbody></table>`;
+    resultDiv.innerHTML = tableHTML;
+}
+
