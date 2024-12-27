@@ -4,13 +4,13 @@ let following = [];
 // Fungsi untuk mengambil file JSON
 function fetchData() {
     // Ambil data followers dari assets/followers.json
-    fetch('assets/followers.json')
+    fetch('followers.json')
         .then(response => response.json())  // Parse data JSON
         .then(followersData => {
             followers = followersData.map(entry => entry.string_list_data[0].value);
             
             // Ambil data following dari assets/following.json
-            fetch('assets/following.json')
+            fetch('following.json')
                 .then(response => response.json())
                 .then(followingData => {
                     following = followingData.relationships_following.map(entry => entry.string_list_data[0]);
